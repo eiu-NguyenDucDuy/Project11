@@ -103,6 +103,7 @@ public class Main {
             JOptionPane.showMessageDialog(null, "Item name cannot be empty.");
             return;
         }
+
         if (!quantityText.isEmpty())
             try {
                 quantity = Integer.parseInt(quantityText);
