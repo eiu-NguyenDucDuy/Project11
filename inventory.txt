@@ -1,4 +1,4 @@
-Car Vehicle 28
+Car Vehicle 16
 Grape Fruit 2
 Truck Vehicle 3
 GrassHopper Animal 5

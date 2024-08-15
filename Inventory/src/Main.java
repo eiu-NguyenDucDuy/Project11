@@ -103,13 +103,12 @@ public class Main {
             JOptionPane.showMessageDialog(null, "Item name cannot be empty.");
             return;
         }
-        if (!quantityText.isEmpty()) {
+        if (!quantityText.isEmpty())
             try {
                 quantity = Integer.parseInt(quantityText);
             } catch (NumberFormatException e) {
                 JOptionPane.showMessageDialog(null, "Setting quantity to 1.");
             }
-        }
         inventory.removeItem(name, quantity);
     }
 
@@ -120,7 +119,10 @@ public class Main {
             JOptionPane.showMessageDialog(null, "Item name cannot be empty.");
             return;
         }
-        inventory.searchItem(name);
+
+        String searchItem = inventory.searchItem(name).toString();
+
+        JOptionPane.showMessageDialog(null, searchItem);
     }
 
     private static void showInventory() {
