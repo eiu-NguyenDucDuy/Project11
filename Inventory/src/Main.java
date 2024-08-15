@@ -1,8 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Main {
     private static Inventory inventory = new Inventory();
@@ -103,7 +101,6 @@ public class Main {
             JOptionPane.showMessageDialog(null, "Item name cannot be empty.");
             return;
         }
-
         if (!quantityText.isEmpty())
             try {
                 quantity = Integer.parseInt(quantityText);

@@ -1,7 +1,7 @@
 Car Vehicle 16
 Grape Fruit 2
 Truck Vehicle 3
-GrassHopper Animal 5
+GrassHopper Animal 12
 Orange Fruit 6
 Dragon Animal 2
 Fox Animal 5
