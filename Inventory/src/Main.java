@@ -1,110 +1,151 @@
-import java.util.Scanner;
+import javax.swing.*;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Main {
     private static Inventory inventory = new Inventory();
+    private static JPanel mainPanel;
+    private static CardLayout cardLayout;
+    private static JPanel displayPanel;
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
+        SwingUtilities.invokeLater(Main::createAndShowGUI);
+    }
 
-        while (true) {
-            System.out.println("\nStore Management System");
-            System.out.println("1. Add Item");
-            System.out.println("2. Remove Item");
-            System.out.println("3. Search Item");
-            System.out.println("4. Display Items");
-            System.out.println("5. Save to File");
-            System.out.println("6. Load from File");
-            System.out.println("7. Exit");
+    private static void createAndShowGUI() {
+        JFrame frame = new JFrame("Inventory Store Mangement");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(400, 400);
 
-            System.out.print("Choose an option: ");
-            int choice = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
+        cardLayout = new CardLayout();
+        mainPanel = new JPanel(cardLayout);
 
-            switch (choice) {
-                case 1:
-                    addItem(scanner);
-                    break;
-                case 2:
-                    removeItem(scanner);
-                    break;
-                case 3:
-                    searchItem(scanner);
-                    break;
-                case 4:
-                    displayItems();
-                    break;
-                case 5:
-                    saveToFile(scanner);
-                    break;
-                case 6:
-                    loadFromFile(scanner);
-                    break;
-                case 7:
-                    System.out.println("Exiting...");
-                    scanner.close();
-                    return;
-                default:
-                    System.out.println("Invalid choice. Please try again.");
+        // input
+        JPanel inputPanel = new JPanel();
+        inputPanel.setLayout(new GridLayout(7, 2, 10, 10));
+
+        JTextField nameField = new JTextField();
+        JTextField categoryField = new JTextField();
+        JTextField quantityField = new JTextField("1");
+        JButton addButton = new JButton("Add");
+        JButton removeButton = new JButton("Remove");
+        JButton searchButton = new JButton("Search");
+        JButton displayButton = new JButton("Display");
+
+        inputPanel.add(new JLabel("Item Name"));
+        inputPanel.add(nameField);
+        inputPanel.add(new JLabel("Item Category"));
+        inputPanel.add(categoryField);
+        inputPanel.add(new JLabel("Item Quantity"));
+        inputPanel.add(quantityField);
+        inputPanel.add(addButton);
+        inputPanel.add(removeButton);
+        inputPanel.add(searchButton);
+        inputPanel.add(displayButton);
+
+        mainPanel.add(inputPanel, "Main Menu");
+
+        // Display panel
+        displayPanel = new JPanel();
+        JTextArea displayArea = new JTextArea();
+        displayArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(displayArea);
+        JButton backButton = new JButton("Back");
+
+        displayPanel.setLayout(new BoxLayout(displayPanel, BoxLayout.Y_AXIS));
+        displayPanel.add(scrollPane, BorderLayout.CENTER);
+        displayPanel.add(backButton);
+        mainPanel.add(displayPanel, "Inventory");
+
+        // Action listeners for buttons
+        addButton.addActionListener(e -> addItem(nameField, categoryField, quantityField));
+        removeButton.addActionListener(e -> removeItem(nameField, quantityField));
+        searchButton.addActionListener(e -> searchItem(nameField));
+        displayButton.addActionListener(e -> showInventory());
+        backButton.addActionListener(e -> cardLayout.show(mainPanel, "Main Menu"));
+
+        frame.add(mainPanel);
+        frame.setVisible(true);
+    }
+
+    private static void addItem(JTextField nameField, JTextField categoryField, JTextField quantityField) {
+        String name = nameField.getText().trim();
+        String category = categoryField.getText().trim();
+        String quantityText = quantityField.getText().trim();
+        int quantity = 1;
+
+        if (name.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Item name cannot be empty.");
+            return;
+        }
+        if (category.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Item category cannot be empty.");
+            return;
+        }
+        if (!quantityText.isEmpty()) {
+            try {
+                quantity = Integer.parseInt(quantityText);
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(null, "Setting quantity to 1.");
             }
         }
+        inventory.addItem(name, category, quantity);
     }
 
-    private static void addItem(Scanner scanner) {
-        System.out.print("Enter item name: ");
-        String name = scanner.nextLine();
-        System.out.print("Enter item category: ");
-        String category = scanner.nextLine();
-        System.out.print("Enter item quantity: ");
-        int quantity = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
+    private static void removeItem(JTextField nameField, JTextField quantityField) {
+        String name = nameField.getText().trim();
+        String quantityText = quantityField.getText().trim();
+        int quantity = 1;
 
-        Item item = new Item(name, category, quantity);
-        inventory.addItem(item);
-        System.out.println("Item added successfully.");
-    }
-
-    private static void removeItem(Scanner scanner) {
-        System.out.print("Enter item name: ");
-        String name = scanner.nextLine();
-        System.out.print("Enter item category: ");
-        String category = scanner.nextLine();
-        System.out.print("Enter quantity to remove: ");
-        int quantity = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
-
-        inventory.removeItem(name, category, quantity);
-    }
-
-    private static void searchItem(Scanner scanner) {
-        System.out.print("Enter item name: ");
-        String name = scanner.nextLine();
-        System.out.print("Enter item category: ");
-        String category = scanner.nextLine();
-
-        Item item = inventory.searchItem(name, category);
-        if (item != null) {
-            System.out.println("Item found: " + item);
-        } else {
-            System.out.println("Item not found.");
+        if (name.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Item name cannot be empty.");
+            return;
         }
+        if (!quantityText.isEmpty()) {
+            try {
+                quantity = Integer.parseInt(quantityText);
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(null, "Setting quantity to 1.");
+            }
+        }
+        inventory.removeItem(name, quantity);
     }
 
-    private static void displayItems() {
-        System.out.println("Displaying all items:");
-        inventory.displayItems();
+    private static void searchItem(JTextField nameField) {
+        String name = nameField.getText().trim();
+
+        if (name.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Item name cannot be empty.");
+            return;
+        }
+        inventory.searchItem(name);
     }
 
-    private static void saveToFile(Scanner scanner) {
-        System.out.print("Enter filename to save to: ");
-        String filename = scanner.nextLine();
-        inventory.saveToFile(filename);
-        System.out.println("Items saved to file.");
-    }
+    private static void showInventory() {
+        displayPanel.removeAll();
+        JButton backButton = new JButton("Back");
+        displayPanel.add(backButton);
 
-    private static void loadFromFile(Scanner scanner) {
-        System.out.print("Enter filename to load from: ");
-        String filename = scanner.nextLine();
-        inventory.loadFromFile(filename);
-        System.out.println("Items loaded from file.");
+        // Display Inventory
+        Map<String, ArrayList<Item>> items = new HashMap<>();
+
+        for (Item item : inventory.getAllItems())
+            items.computeIfAbsent(item.getCategory(), k -> new ArrayList<>()).add(item);
+
+        for (Map.Entry<String, ArrayList<Item>> display : items.entrySet()) {
+            StringBuilder categoryDisplay = new StringBuilder("\nCategory: ").append(display.getKey()).append("\n");
+            for (Item item : display.getValue()) {
+                categoryDisplay.append("  Name: ").append(item.getName())
+                        .append(", Quantity: ").append(item.getQuantity())
+                        .append("\n");
+            }
+            displayPanel.add(new JLabel("<html>" + categoryDisplay.toString().replaceAll("\n", "<br/>") + "</html>"));
+        }
+
+        backButton.addActionListener(e -> cardLayout.show(mainPanel, "Main Menu"));
+
+        cardLayout.show(mainPanel, "Inventory");
     }
 }

@@ -1,0 +1,10 @@
+Car Vehicle 28
+Grape Fruit 2
+Truck Vehicle 3
+GrassHopper Animal 5
+Orange Fruit 6
+Dragon Animal 2
+Fox Animal 1
+Banana Fruit 3
+Melon Fruit 3
+Motorbike Vehicle 3

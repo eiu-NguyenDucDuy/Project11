@@ -27,6 +27,6 @@ public class Item {
 
     @Override
     public String toString() {
-        return "Item{name='" + name + "', category='" + category + "', quantity=" + quantity + '}';
+        return name + " " + category + " " + quantity;
     }
 }

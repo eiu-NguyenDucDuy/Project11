@@ -2,86 +2,68 @@ import java.io.*;
 import java.util.*;
 
 public class Inventory {
-    private List<Item> items;
+    private Map<String, Item> items = new HashMap<>();
+    private static final String FILE_PATH = "inventory.txt";
 
     public Inventory() {
-        items = new ArrayList<>();
+        loadFromFile();
     }
 
-    public void addItem(Item item) {
-        for (Item i : items) {
-            if (i.getName().equals(item.getName()) && i.getCategory().equals(item.getCategory())) {
-                i.setQuantity(i.getQuantity() + item.getQuantity());
-                return;
-            }
+    public void addItem(String name, String category, int quantity) {
+        if (items.containsKey(name)) {
+            Item item = items.get(name);
+            item.setQuantity(item.getQuantity() + quantity);
+        } else {
+            items.put(name, new Item(name, category, quantity));
         }
-        items.add(item);
+        saveToFile();
     }
 
-    public void removeItem(String name, String category, int quantity) {
-        for (Item i : items) {
-            if (i.getName().equals(name) && i.getCategory().equals(category)) {
-                if (i.getQuantity() >= quantity) {
-                    i.setQuantity(i.getQuantity() - quantity);
-                    if (i.getQuantity() == 0) {
-                        items.remove(i);
-                    }
-                } else {
-                    System.out.println("Not enough quantity to remove.");
-                }
-                return;
-            }
+    public void removeItem(String name, int quantity) {
+        if (items.containsKey(name)) {
+            Item item = items.get(name);
+            int currentQuantity = item.getQuantity();
+            if (quantity >= currentQuantity)
+                items.remove(name);
+            else
+                item.setQuantity(currentQuantity - quantity);
         }
-        System.out.println("Item not found.");
+        saveToFile();
     }
 
-    public Item searchItem(String name, String category) {
-        for (Item i : items) {
-            if (i.getName().equals(name) && i.getCategory().equals(category)) {
-                return i;
-            }
-        }
-        return null;
+    public Item searchItem(String name) {
+        return items.get(name);
     }
 
-    public void displayItems() {
-        if (items.isEmpty()) {
-            System.out.println("No items in inventory.");
-            return;
-        }
-        for (Item i : items) {
-            System.out.println(i);
-        }
+    public Collection<Item> getAllItems() {
+        return items.values();
     }
 
-    // Save items to a file
-    public void saveToFile(String filename) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
-            for (Item item : items) {
-                writer.write(item.getName() + "," + item.getCategory() + "," + item.getQuantity());
+    private void saveToFile() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH))) {
+            for (Item item : items.values()) {
+                writer.write(item.toString());
                 writer.newLine();
             }
         } catch (IOException e) {
-            System.out.println("Error saving to file: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
-    // Load items from a file
-    public void loadFromFile(String filename) {
-        items.clear();
-        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+    private void loadFromFile() {
+        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
+                String[] parts = line.split(" ");
                 if (parts.length == 3) {
                     String name = parts[0];
                     String category = parts[1];
                     int quantity = Integer.parseInt(parts[2]);
-                    items.add(new Item(name, category, quantity));
+                    items.put(name, new Item(name, category, quantity));
                 }
             }
         } catch (IOException e) {
-            System.out.println("Error loading from file: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }
