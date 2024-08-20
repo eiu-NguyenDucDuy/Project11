@@ -21,6 +21,14 @@ public class Item {
         return quantity;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
     public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
